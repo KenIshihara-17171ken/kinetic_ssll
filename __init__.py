@@ -1,8 +1,10 @@
 import numpy as np
 import pdb
-from ssll.container import*
-from ssll.exp_max import*
+from ssll_kinetic.container import*
+from ssll_kinetic.exp_max import*
 
+#Use it when test
+import container
 
 
 def run(I,spikes,FSUM,Q,ID,mu,max_iter=100, mstep=True):

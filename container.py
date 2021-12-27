@@ -1,7 +1,8 @@
 import numpy as np
 import pdb
+from ssll_kinetic.probability import*
+
 # import probability
-from ssll.probability import*
 
 
 #importのところが怪しい#
