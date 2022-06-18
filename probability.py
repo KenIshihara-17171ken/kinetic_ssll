@@ -19,6 +19,8 @@ def log_marginal(emd):
 
                 s = np.append(1, emd.spikes[t,l])
                 PSI += np.log(1+np.exp(np.dot(emd.theta_f[t,i],s)))
+                # print('emd.theta_f[t,i]',emd.theta_f[t,i])
+                # print("emd.FSUM[t,i]",emd.FSUM[t,i])
 
             q = (np.dot(emd.theta_f[t,i], emd.FSUM[t,i]) - PSI) - b
             # log_p += .5*logdet_sigma_f - .5*logdet_sigma_o + q

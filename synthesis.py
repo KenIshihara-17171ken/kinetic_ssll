@@ -31,7 +31,7 @@ def get_THETA_function(T,R,N):
     np.random.seed(1) 
     f = np.random.uniform(1,5,(N,N+1))
     # random.seed(1)
-    np.random.seed(1) 
+    # np.random.seed(1) 
     phi = np.random.uniform(0,6,(N,N+1))
 
     pi = np.pi
@@ -52,14 +52,16 @@ def get_THETA_function(T,R,N):
 
     return THETA
 
-def get_THETA_gaussian_process(T, N, sigma):
+def get_THETA_gaussian_process(T, N, sigma=1):
     THETA = np.zeros((T,N,N+1))
     for i in range(N):
         THETA[:,i,:] = generate_thetas(T, D = N+1, sigma=sigma)
 
+    # print('aaTHETA',THETA)
+
     return THETA
 
-def generate_thetas(T, D = 3, mu=-.5, sigma=50, alpha=.5):
+def generate_thetas(T, D , mu=1, sigma=4, alpha=0.1):
     """ Generates dynamic thetas by a Gaussian Process.
 
     :param int T:
@@ -77,15 +79,22 @@ def generate_thetas(T, D = 3, mu=-.5, sigma=50, alpha=.5):
          'd' is the dimensionality of the model.
     """
     MU = np.tile(mu, (T, D))
+    # print('',MU)
     # Create covariance matrix
     X = np.tile(np.arange(T),(T,1))
+    # print('X',X)
     K = 1./alpha*np.exp(-(X - X.transpose()) ** 2 / (2. * sigma ** 2))
+    # print(' K', K)
     # Generate Gaussian processes
     L = np.linalg.cholesky(K + 1e-13 * np.eye(T))
-    theta = np.empty([T, D])
-    theta = mu + np.dot(L, np.random.randn(T, D))
+    
+    THETA = np.empty([T, D])
+    THETA = mu + np.dot(L, np.random.randn(T, D))
 
-    return theta
+    # print('THETA',THETA)
+
+    return THETA
+
 
 
 def get_S_function(T,R,N,THETA):
@@ -134,27 +143,27 @@ def get_S_function(T,R,N,THETA):
 
 
 
-def get_FSUM(spikes,T,R,N):
-    """
-    This funciton computes
+# def get_FSUM(spikes,T,R,N):
+#     """
+#     This funciton computes
 
-    :param numpy.ndarray spikes:
-        Numpy array (time+1,nnum) of spike data.
-    :param int R:
-        The number of total trial.
-    :param int T:
-        The length of the observation time.
-    :param int N:
-        The number of neurons.
-    returns numpy.ndarray FSUM:
-        Numpy array (T,N) of FSUM.
+#     :param numpy.ndarray spikes:
+#         Numpy array (time+1,nnum) of spike data.
+#     :param int R:
+#         The number of total trial.
+#     :param int T:
+#         The length of the observation time.
+#     :param int N:
+#         The number of neurons.
+#     returns numpy.ndarray FSUM:
+#         Numpy array (T,N) of FSUM.
 
-    @author: Ken Ishihara
-    """
-    FSUM = np.zeros((T, N, N+1))
-    for l in range(R):
-        for t in range(1, T+1):
-            for n in range(N):
-                FSUM[t-1, n] += np.append(spikes[t, l, n], spikes[t, l, n]*spikes[t-1,l])
+#     @author: Ken Ishihara
+#     """
+#     FSUM = np.zeros((T, N, N+1))
+#     for l in range(R):
+#         for t in range(1, T+1):
+#             for n in range(N):
+#                 FSUM[t-1, n] += np.append(spikes[t, l, n], spikes[t, l, n]*spikes[t-1,l])
 
-    return FSUM
+#     return FSUM
