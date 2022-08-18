@@ -39,7 +39,9 @@ def get_Q(emd):
             - np.outer(emd.theta_s[t,i],emd.theta_s[t-1,i]) - emd.lag_one_covariance[t-1,i].T \
             + np.outer(emd.theta_s[t-1,i],emd.theta_s[t-1,i]) + emd.sigma_s[t-1,i]
         emd.Q[i]=tmp/(emd.T-1)
-    return emd.Q
+    emd.state_cov =  emd.Q
+    # return emd.Q
+    return emd.state_cov
 
 
 def log_marginal_likelihood(emd):
@@ -95,18 +97,15 @@ def cal_eta_G(emd,theta, t,R, N, spikes ):
 
 # def filter_function(R, T, N, FSUM, Q, spikes):
 def filter_function(emd):
-    emd.state_cov = np.zeros((emd.N,emd.N+1,emd.N+1))
-    emd.theta_o = np.zeros((emd.N,emd.N+1))
-
-
-
-    for i in range(emd.N):
-        emd.state_cov[i] = 0.1*np.identity(emd.N+1)
+    # emd.state_cov = np.zeros((emd.N,emd.N+1,emd.N+1))
+    # emd.theta_o = np.zeros((emd.N,emd.N+1))
+    # for i in range(emd.N):
+    #     emd.state_cov[i] = 0.1*np.identity(emd.N+1)
 
     # Filtering at the initial time bin
     for i in range(emd.N):
 
-        emd.state_cov_inv = np.linalg.inv(emd.state_cov[i])
+        # emd.state_cov_inv = np.linalg.inv(emd.state_cov[i])
 
         # Estimation of theta by Newton Rapson method
         max_dlpo = np.inf
@@ -114,9 +113,10 @@ def filter_function(emd):
         while max_dlpo > GA_CONVERGENCE:
             # Compute the first derivative of negative of the posterior prob. w.r.t. theta_max
             eta, G = cal_eta_G(emd,emd.theta_f[0,i],0,emd.R,emd.N,emd.spikes)
-            dlpo = -(emd.FSUM[0,i] - eta) + np.dot(emd.state_cov_inv,emd.theta_f[0][i]- emd.theta_o[i])
+            dlpo = -(emd.FSUM[0,i] - eta) + np.dot( emd.init_cov[i],emd.theta_f[0][i]-  emd.init_theta[0,i])
             # Compute the second derivative of negative of the posterior prob. w.r.t. theta_max
-            ddlpo = G +emd.state_cov_inv
+            # ddlpo = G +emd.state_cov_inv
+            ddlpo = G + emd.init_cov[i]
             ddlpo_i = np.linalg.inv(ddlpo)
             # Update theta
             emd.theta_f[0,i] = emd.theta_f[0,i] - np.dot(ddlpo_i, dlpo)
@@ -136,7 +136,7 @@ def filter_function(emd):
         emd.sigma_f_i[0,i] = ddlpo
 
 
-        emd.sigma_o[0,i] =emd.state_cov[i]
+        emd.sigma_o[0,i] = emd.init_cov[i]
         emd.sigma_o_i[0,i] = np.linalg.inv(emd.sigma_o[0,i])
 
     # Filtering for time bins t > 1
@@ -148,7 +148,7 @@ def filter_function(emd):
             # print("emd.sigma_f[t-1,i]",emd.sigma_f[t-1,i])
             # print("emd.sigma_o[t,i]",emd.sigma_o[t,i])
             # Compute one-step prediction density
-            emd.sigma_o[t,i] = emd.sigma_f[t-1,i]+emd.Q[i]
+            emd.sigma_o[t,i] = emd.sigma_f[t-1,i]+emd.state_cov[i]
            
 
             emd.sigma_o_i[t,i] = np.linalg.inv(emd.sigma_o[t,i])

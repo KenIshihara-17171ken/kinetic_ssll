@@ -6,12 +6,10 @@ from ssll_kinetic.probability import*
 log_marginal_functions = log_marginal
 
 class EMData:
-    # def __init__( self, spikes, Q, ID, mu ):
-    def __init__( self, spikes, state_cov, init_cov, init_theta):
+    def __init__( self, spikes, Q, ID, mu ):
         # def run(spikes,FSUM,state_cov,sigma_o,theta_o,max_iter=100, mstep=True, show_llk=True):
 
-        # self.spikes,  self.Q, self.ID, self.mu = spikes, Q, ID, mu
-        self.spikes,  self.state_cov, self.init_cov, self.init_theta = spikes, state_cov, init_cov, init_theta
+        self.spikes,  self.Q, self.ID, self.mu = spikes, Q, ID, mu
 
         self.T= spikes.shape[0]-1
         self.R = spikes.shape[1]

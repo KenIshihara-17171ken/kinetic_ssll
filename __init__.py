@@ -17,11 +17,12 @@ import timeit
 
 
 # def run(spikes,FSUM,state_cov,sigma_o,theta_o,max_iter=100, mstep=True):
-def run(spikes,state_cov,sigma_o,theta_o,max_iter=100, mstep=True):
-
+# def run(spikes,state_cov,sigma_o,theta_o,max_iter=100, mstep=True):
+def run(spikes,state_cov,init_cov,init_theta,max_iter=100, mstep=True):
 
     # emd = container.EMData(spikes,FSUM,state_cov,sigma_o,theta_o)
-    emd = container.EMData(spikes,state_cov,sigma_o,theta_o)
+    # emd = container.EMData(spikes,state_cov,sigma_o,theta_o)
+    emd = container.EMData(spikes,state_cov,init_cov,init_theta)
     lmc = emd.marg_llk(emd)
 
     # Iterate the EM algorithm until convergence or failure
